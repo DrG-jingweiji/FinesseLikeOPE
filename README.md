@@ -87,4 +87,3 @@ All generated outputs now live under one output root:
 - `outputs/reports/`: aggregate figures and CSV summaries.
 - `outputs/single_instances/`: smoke tests and one-off instance logs.
 
-Generated artifacts are not intended to be edited by hand.
