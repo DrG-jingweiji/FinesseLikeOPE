@@ -1,0 +1,6 @@
+comparator,comparator_label,cells,cells_favoring_ours,cells_favoring_comparator,geometric_mean_comparator_over_ours_mse,significant_ours_wins_95pct,significant_comparator_wins_95pct
+trajectory_is,Trajectory IS,18,18,0,20.976345526072716,11,0
+full_pdis,Full PDIS,18,18,0,14.118160856597592,14,0
+self_normalized_pdis,Self-normalized PDIS,18,12,6,1.212964501181301,10,5
+dr_ridgecv,DR,18,12,6,3.1780830585192144,5,4
+continuous_fh_mis_ridgecv,Continuous FH-MIS,18,12,6,1.3394000212273622,10,6

@@ -4,3 +4,8 @@
 outputs/reports/
 outputs/single_instances/
 .idea/
+.venv/
+.DS_Store
+third_party/
+**/outputs/
+**/reproduced_figures/

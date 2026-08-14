@@ -13,7 +13,12 @@ def per_trajectory_window_is(
     target_policy: str,
     behavior_policy: str,
 ) -> Dict[str, np.ndarray]:
-    """Return per-trajectory rolling truncated IS estimates for k=1,...,T."""
+    """Return reward-time-indexed rolling IS estimates for k=1,...,T.
+
+    Reward ``R_t`` is observed before ``A_t``. Its length-``k`` weight is the
+    product of ratios for actions ``A_max(0,t-k),...,A_{t-1}``; the product is
+    one at ``t=0``.
+    """
 
     x = batch.states
     a = batch.actions
@@ -41,8 +46,8 @@ def per_trajectory_window_is(
         weighted_rewards = np.zeros((n, horizon), dtype=float)
         flat_weights = []
         for t in range(horizon):
-            start = max(0, t - k + 1)
-            window_log_w = csum[:, t + 1] - csum[:, start]
+            start = max(0, t - k)
+            window_log_w = csum[:, t] - csum[:, start]
             weights = np.exp(np.clip(window_log_w, -60.0, 60.0))
             weighted_rewards[:, t] = weights * r[:, t]
             flat_weights.append(weights)
@@ -55,4 +60,3 @@ def per_trajectory_window_is(
         "estimates": estimates,
         "is_ess": is_ess,
     }
-

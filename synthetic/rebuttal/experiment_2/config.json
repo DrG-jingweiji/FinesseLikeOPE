@@ -1,0 +1,111 @@
+{
+  "status": "Experiment II configuration",
+  "purpose": "paired exact-state comparison of kernel-localized rolling IPW with standard OPE benchmarks at n=2000",
+  "primary_question": "How do rolling IPW, exact finite-horizon MIS, and Sequential DR compare as the rapidly forgetting augmented state becomes high-cardinality?",
+  "simulator": {
+    "state": "d_x/2 independent binary pairs in {-1,+1}; each pair is (B_j, B_j C_j), with B_j Rademacher and the regime controlling P(C_j=+1)",
+    "state_dimensions": [4, 8, 12, 16],
+    "embedding_dimension": 3,
+    "horizon": 160,
+    "pre_sticky_probability": 0.1,
+    "pre_refresh_probability": 0.9,
+    "post_sticky_probability": 0.5,
+    "post_refresh_probability": 0.5,
+    "dobrushin_contraction_upper_bound": 0.5,
+    "pre_pair_logits": [-0.35, -0.21, -0.07, 0.07, 0.21, 0.35, -0.49, 0.49],
+    "post_pair_logits": [0.35, 0.21, 0.07, -0.07, -0.21, -0.35, 0.49, -0.49],
+    "pair_embedding_loadings": [
+      [0.3, 0.0, 0.15],
+      [0.15, 0.26, -0.15],
+      [-0.15, 0.26, 0.15],
+      [-0.3, 0.0, -0.15],
+      [-0.15, -0.26, 0.15],
+      [0.15, -0.26, -0.15],
+      [0.21213203435596426, 0.21213203435596426, 0.15],
+      [-0.21213203435596426, -0.21213203435596426, -0.15]
+    ],
+    "policy_probability_floor": 0.02,
+    "policy_probability_span": 0.12,
+    "policy_temperature": 4.0,
+    "policy_embedding_score": "0.20 * (z_1 - 0.5 z_2 + 0.25 z_3)",
+    "policy_design": "behavior uses +4.0 g_d(x), target uses -4.0 g_d(x), with identical intercept and embedding term; global sign symmetry gives identical intervention-time laws",
+    "reward": "r(x)=0.50+0.35*tanh(2*g_d(x))+0.10*tanh(0.7*h_d(x)); it is state-only, lies in [0.05,0.95], and creates a non-null target-behavior contrast",
+    "reward_main_effect": "g_d(x)=sum_j x_j/sqrt(d_x)",
+    "reward_interaction": "h_d(x)=sqrt(2/d_x)*sum_pair_j (-1)^(j+1) x_(2j-1)x_(2j)"
+  },
+  "evaluation": {
+    "sample_sizes": [2000],
+    "repetitions": 100,
+    "truncation_window": 5,
+    "bandwidth_rule": "h_n = 2.5 * n^(-1/5)",
+    "bandwidth_constant": 2.5,
+    "truth_method": "exact finite-state dynamic programming over 2^d_x states",
+    "methods": [
+      "ours_k5",
+      "trajectory_is",
+      "full_pdis",
+      "self_normalized_pdis",
+      "sequential_dr",
+      "exact_finite_horizon_mis"
+    ],
+    "dr_definition": "the same two-fold trajectory-cross-fitted Sequential DR used in Experiment 1, with global time-indexed linear Bellman nuisances and Gaussian-localized held-out scores",
+    "dr_features": "[X,Z,M,A,A*X,A*Z,A*M], with an unpenalized intercept supplied by RidgeCV",
+    "dr_ridge_alpha_grid": [
+      0.0001,
+      0.001,
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0,
+      1000.0,
+      10000.0,
+      100000.0
+    ],
+    "dr_cross_fitting": "two trajectory-level folds; every time-specific penalty is selected by training-fold-only RidgeCV; target truth is never used",
+    "target_embeddings": [
+      {"key": "z00", "value": [0.0, 0.0, 0.0]},
+      {"key": "z01", "value": [0.6, 0.0, 0.0]},
+      {"key": "z02", "value": [-0.6, 0.0, 0.0]},
+      {"key": "z03", "value": [0.0, 0.6, 0.0]},
+      {"key": "z04", "value": [0.0, -0.6, 0.0]},
+      {"key": "z05", "value": [0.0, 0.0, 0.6]},
+      {"key": "z06", "value": [0.0, 0.0, -0.6]},
+      {"key": "z07", "value": [0.45, 0.45, 0.45]},
+      {"key": "z08", "value": [-0.45, -0.45, 0.45]},
+      {"key": "z09", "value": [0.45, -0.45, -0.45]}
+    ]
+  },
+  "seeds": {
+    "base_data": 2026072601,
+    "truth": 2026072691,
+    "base_dr_split": 2026072791
+  },
+  "selection_protocol": {
+    "truth_usage": "target values are computed independently for scoring only; Sequential DR uses only logged training-fold data",
+    "hyperparameter_selection": "Ours, FH-MIS, and the simulator remain fixed; Sequential DR uses the Experiment-1 Ridge grid and training-fold-only RidgeCV",
+    "embedding_selection": "ten symmetric central points fixed before the original confirmatory run and all reported with equal weight",
+    "dimension_construction": "the d_x=4,8,12 parameter vectors are prefixes of the d_x=16 specification; the final two binary pairs continue the symmetric logit sequence and use opposite equal-norm embedding loadings",
+    "pairing": "all methods share the same behavior trajectories within repetition, dimension, sample size, and embedding"
+  },
+  "analysis_contract": {
+    "primary_metric": "equal-embedding aggregate MSE at each state dimension for n=2000",
+    "primary_comparison": "MSE(FH-MIS) and MSE(Sequential DR), each divided by MSE(Ours); values above one favor Ours",
+    "secondary_metrics": [
+      "fraction of target embeddings where Ours has lower MSE",
+      "paired mean squared-error difference with a 95% confidence interval",
+      "FH-MIS occupied-state and singleton fractions",
+      "kernel effective sample size",
+      "intervention-time diagnostics",
+      "Sequential DR selected-penalty diagnostics"
+    ],
+    "required_plots": [
+      "RMSE versus state dimension at n=2000",
+      "FH-MIS-to-Ours MSE ratio versus state dimension",
+      "Sequential-DR-to-Ours MSE ratio versus state dimension",
+      "fraction of target embeddings favoring Ours over FH-MIS",
+      "FH-MIS state-coverage diagnostics",
+      "behavior-versus-target intervention survival"
+    ]
+  }
+}
