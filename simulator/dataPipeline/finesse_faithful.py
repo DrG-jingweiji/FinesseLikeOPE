@@ -12,7 +12,7 @@ from dataPipeline.event_sim import sigmoid
 from shared.contracts import TrajectoryBatch
 
 
-DEFAULT_FINESSE_ROOT = Path(r"D:\Dropbox\C1Research\Numerical\_external\FINESSE")
+DEFAULT_FINESSE_ROOT = Path(__file__).resolve().parents[2] / "third_party" / "FINESSE"
 
 
 class FinesseFaithfulSimulator:
@@ -46,7 +46,9 @@ class FinesseFaithfulSimulator:
         self.allow_type_transitions = allow_type_transitions
         self.intervention_strength = intervention_strength
         self.reward_mode = reward_mode
-        self.finesse_root = Path(finesse_root) if finesse_root is not None else DEFAULT_FINESSE_ROOT
+        self.finesse_root = (
+            Path(finesse_root) if finesse_root is not None else DEFAULT_FINESSE_ROOT
+        )
         if not self.finesse_root.exists():
             raise FileNotFoundError(f"FINESSE root not found: {self.finesse_root}")
         if str(self.finesse_root) not in sys.path:

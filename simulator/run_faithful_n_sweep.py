@@ -111,7 +111,11 @@ def main() -> None:
         default="default",
         choices=["default", "treatment_sensitive", "treatment_very_sensitive"],
     )
-    parser.add_argument("--finesse-root", type=str, default=r"D:\Dropbox\C1Research\Numerical\_external\FINESSE")
+    parser.add_argument(
+        "--finesse-root",
+        type=str,
+        default=str(ROOT.parent / "third_party" / "FINESSE"),
+    )
     parser.add_argument("--out-root", type=str, default=str(ROOT / "outputs" / "reports"))
     parser.add_argument("--run-name", type=str, default="")
     parser.add_argument("--linear-x", action="store_true")
@@ -251,4 +255,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

@@ -138,7 +138,11 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=20260427)
     parser.add_argument("--target-policy", type=str, default="target_finesse_step")
     parser.add_argument("--behavior-policy", type=str, default="behavior_finesse_logit")
-    parser.add_argument("--finesse-root", type=str, default=r"D:\Dropbox\C1Research\Numerical\_external\FINESSE")
+    parser.add_argument(
+        "--finesse-root",
+        type=str,
+        default=str(ROOT.parent / "third_party" / "FINESSE"),
+    )
     parser.add_argument("--fixed-affinity-type", type=str, default="Type2")
     parser.add_argument("--fixed-payment-strategy-type", type=str, default="Type2")
     parser.add_argument("--allow-type-transitions", action="store_true")
@@ -315,4 +319,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
